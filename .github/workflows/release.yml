@@ -32,11 +32,11 @@ jobs:
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
-          workspaces: './bismillah-panel/src-tauri -> target'
+          workspaces: './bismillah-panel/bismillah-panel/src-tauri -> target'
 
       - name: Install dependencies
         run: |
-          cd bismillah-panel
+          cd bismillah-panel/bismillah-panel
           npm install
 
       - name: Build Tauri App
@@ -49,4 +49,4 @@ jobs:
           releaseBody: "Automated compilation of shawapump bot control panel (.msi)."
           releaseDraft: true
           prerelease: false
-          projectPath: "./bismillah-panel"
+          projectPath: "./bismillah-panel/bismillah-panel"
