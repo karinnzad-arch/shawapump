@@ -1,0 +1,52 @@
+name: Release Build
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-tauri:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows-latest
+            args: ""
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './bismillah-panel/src-tauri -> target'
+
+      - name: Install dependencies
+        run: |
+          cd bismillah-panel
+          npm install
+
+      - name: Build Tauri App
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: app-v1.0.0
+          releaseName: "shawapump v1.0.0"
+          releaseBody: "Automated compilation of shawapump bot control panel (.msi)."
+          releaseDraft: true
+          prerelease: false
+          projectPath: "./bismillah-panel"
