@@ -7,16 +7,7 @@ on:
 
 jobs:
   build-tauri:
-    permissions:
-      contents: write
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: windows-latest
-            args: ""
-
-    runs-on: ${{ matrix.platform }}
+    runs-on: windows-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -29,24 +20,18 @@ jobs:
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Rust cache
-        uses: swatinem/rust-cache@v2
-        with:
-          workspaces: './bismillah-panel/bismillah-panel/src-tauri -> target'
-
       - name: Install dependencies
         run: |
-          cd bismillah-panel/bismillah-panel
+          cd bismillah-panel
           npm install
 
       - name: Build Tauri App
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd bismillah-panel
+          npm run tauri build
+
+      - name: Upload MSI Installer
+        uses: actions/upload-artifact@v4
         with:
-          tagName: app-v1.0.0
-          releaseName: "shawapump v1.0.0"
-          releaseBody: "Automated compilation of shawapump bot control panel (.msi)."
-          releaseDraft: true
-          prerelease: false
-          projectPath: "./bismillah-panel/bismillah-panel"
+          name: shawapump-installer-msi
+          path: bismillah-panel/src-tauri/target/release/bundle/msi/*.msi
